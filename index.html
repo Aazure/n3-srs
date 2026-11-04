@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>N3 一個月衝刺 — 單字・文法 SRS</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#c2410c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="N3衝刺">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f4ee;--card:#ffffff;--ink:#1f1d1a;--muted:#6b665d;--line:#e4e0d6;
+  --accent:#c2410c;--accent-soft:#fde8dc;--good:#15803d;--good-soft:#dcfce7;
+  --warn:#b45309;--warn-soft:#fef3c7;--bad:#b91c1c;--bad-soft:#fee2e2;--blue:#1d4ed8;--blue-soft:#dbeafe;
+  --radius:14px;--shadow:0 1px 2px rgba(0,0,0,.05),0 6px 20px rgba(0,0,0,.05);
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#161512;--card:#201e1a;--ink:#f1ede4;--muted:#a19a8d;--line:#332f29;
+  --accent:#fb923c;--accent-soft:#3b2416;--good:#4ade80;--good-soft:#14301e;
+  --warn:#fbbf24;--warn-soft:#3a2a0c;--bad:#f87171;--bad-soft:#3b1515;--blue:#60a5fa;--blue-soft:#172554;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 20px rgba(0,0,0,.25);}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC","Noto Sans JP",system-ui,sans-serif;line-height:1.5}
+.jp{font-family:"Noto Sans JP","Noto Sans TC",sans-serif}
+header{position:sticky;top:0;z-index:10;background:var(--bg);padding:calc(env(safe-area-inset-top,0px) + 12px) 16px 8px;border-bottom:1px solid var(--line)}
+header h1{margin:0;font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px}
+header h1 span{font-size:12px;font-weight:500;color:var(--muted)}
+nav{display:flex;gap:4px;margin-top:8px;overflow-x:auto}
+nav button{flex:1;min-width:64px;border:0;background:transparent;color:var(--muted);padding:8px 6px;border-radius:10px;font:inherit;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap}
+nav button.active{background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+main{max-width:720px;margin:0 auto;padding:16px 16px calc(env(safe-area-inset-bottom,0px) + 40px)}
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:16px}
+.muted{color:var(--muted);font-size:13px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--bg);border-radius:12px;padding:12px}
+.stat .n{font-size:26px;font-weight:700;line-height:1.1}
+.stat .l{font-size:12px;color:var(--muted);margin-top:2px}
+button.btn{border:0;border-radius:12px;padding:12px 18px;font:inherit;font-size:15px;font-weight:600;cursor:pointer;background:var(--accent);color:#fff;transition:transform .05s}
+button.btn:active{transform:scale(.97)}
+button.btn.secondary{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+button.btn.small{padding:8px 12px;font-size:13px;border-radius:10px}
+button.btn:disabled{opacity:.45;cursor:default}
+.bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .3s}
+.pill{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.pill.box0{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.pill.box1,.pill.box2{background:var(--warn-soft);color:var(--warn);border-color:transparent}
+.pill.box3,.pill.box4{background:var(--blue-soft);color:var(--blue);border-color:transparent}
+.pill.box5{background:var(--good-soft);color:var(--good);border-color:transparent}
+/* flashcard */
+.fc{min-height:300px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;cursor:pointer;user-select:none;padding:28px 18px}
+.fc .kind{font-size:12px;color:var(--muted);margin-bottom:12px;letter-spacing:.08em}
+.fc .front{font-size:40px;font-weight:700;line-height:1.25}
+.fc .front.g{font-size:28px}
+.fc .hint{margin-top:18px;font-size:13px;color:var(--muted)}
+.fc .back{margin-top:14px;width:100%;text-align:left;border-top:1px dashed var(--line);padding-top:14px}
+.fc .reading{font-size:20px;color:var(--accent);text-align:center;font-weight:500}
+.fc .meaning{font-size:22px;text-align:center;margin-top:6px;font-weight:600}
+.fc .ex{margin-top:14px;font-size:17px;line-height:1.7}
+.fc .ex small{display:block;color:var(--muted);font-size:14px}
+.fc .form{margin-top:10px;font-size:14px;color:var(--muted)}
+.rate{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.rate button{border:0;border-radius:12px;padding:14px 6px;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.rate button small{display:block;font-size:11px;font-weight:400;opacity:.8;margin-top:2px}
+.rate .again{background:var(--bad-soft);color:var(--bad)}
+.rate .hard{background:var(--warn-soft);color:var(--warn)}
+.rate .good{background:var(--good-soft);color:var(--good)}
+/* list */
+.search{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:15px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
+.chips button{border:1px solid var(--line);background:var(--card);color:var(--muted);border-radius:99px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer}
+.chips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.item{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.item:last-child{border-bottom:0}
+.item .w{font-size:18px;font-weight:600}
+.item .r{color:var(--accent);font-size:13px;margin-left:6px;font-weight:500}
+.item .m{color:var(--muted);font-size:14px}
+.item .right{text-align:right;flex-shrink:0}
+.item .right .muted{font-size:11px}
+.gitem{padding:12px 0;border-bottom:1px solid var(--line)}
+.gitem:last-child{border-bottom:0}
+.gitem .p{font-size:17px;font-weight:700}
+.gitem .m{font-size:14px}
+.gitem details{margin-top:4px;font-size:14px}
+.gitem summary{color:var(--muted);cursor:pointer;font-size:13px}
+.gitem .ex{margin-top:6px;line-height:1.7}
+.gitem .ex small{display:block;color:var(--muted)}
+/* quiz */
+.q{font-size:26px;font-weight:700;text-align:center;padding:20px 8px;line-height:1.4}
+.q small{display:block;font-size:14px;color:var(--muted);font-weight:400;margin-top:4px}
+.opts{display:grid;gap:8px}
+.opts button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:12px;padding:14px;font:inherit;font-size:17px;text-align:left;cursor:pointer}
+.opts button.correct{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+.opts button.wrong{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.opts button:disabled{cursor:default}
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(10,1fr);gap:6px}
+.cal div{aspect-ratio:1;border-radius:8px;background:var(--bg);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted)}
+.cal div.done{background:var(--good-soft);color:var(--good);border-color:transparent;font-weight:700}
+.cal div.today{outline:2px solid var(--accent)}
+textarea{width:100%;min-height:90px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:12px;padding:10px;font-family:ui-monospace,monospace}
+input[type=number]{width:70px;padding:8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+body.muted .spk:not(#mute){display:none}
+.spk{border:1px solid var(--line);background:var(--card);color:var(--accent);border-radius:99px;width:34px;height:34px;font-size:16px;cursor:pointer;vertical-align:middle;margin-left:6px;line-height:1}
+.spk:active{transform:scale(.92)}
+.toast{position:fixed;left:50%;bottom:30px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:50}
+.toast.show{opacity:1}
+.empty{text-align:center;padding:30px 10px;color:var(--muted)}
+.kbd{font-size:11px;color:var(--muted);text-align:center;margin-top:8px}
+@media (max-width:480px){.fc .front{font-size:34px}.q{font-size:22px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>N3 一個月衝刺 <span id="hdr-sub"></span><button class="spk" id="mute" style="margin-left:auto" title="聲音開關">🔇</button></h1>
+  <nav id="nav">
+    <button data-v="home" class="active">今日</button>
+    <button data-v="study">學習</button>
+    <button data-v="quiz">測驗</button>
+    <button data-v="vocab">單字</button>
+    <button data-v="grammar">文法</button>
+    <button data-v="settings">設定</button>
+  </nav>
+</header>
+<main id="main"></main>
+<div class="toast" id="toast"></div>
+<script src="data.js"></script>
+<script>
+// ---------- utils ----------
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const todayKey=(d=new Date())=>{const t=new Date(d.getTime()-d.getTimezoneOffset()*60000);return t.toISOString().slice(0,10)};
+const dayDiff=(a,b)=>Math.round((new Date(b)-new Date(a))/86400000);
+const addDays=(key,n)=>{const d=new Date(key+"T00:00:00");d.setDate(d.getDate()+n);return todayKey(d)};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const sample=(a,n,excl)=>shuffle(a.filter(x=>x!==excl)).slice(0,n);
+let jaVoice=null;function pickVoice(){try{const vs=speechSynthesis.getVoices().filter(v=>/^ja/i.test(v.lang));jaVoice=vs.find(v=>/Kyoko|O-ren|Google|Nanami|Keita|Premium|Enhanced/i.test(v.name))||vs[0]||null}catch(e){}}
+if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
+function speak(text,rate){try{if(S.settings.mute){return}if(!("speechSynthesis" in window)){toast("此瀏覽器不支援語音");return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="ja-JP";if(jaVoice)u.voice=jaVoice;u.rate=rate||(S.settings.rate||0.9);speechSynthesis.speak(u);if(!jaVoice)toast("找不到日文語音，請在系統安裝日文語音包")}catch(e){}}
+function spk(text){return `<button class="spk" data-say="${esc(text)}" title="朗讀">🔊</button>`}
+function bindSpk(){document.querySelectorAll("[data-say]").forEach(b=>b.onclick=e=>{e.stopPropagation();speak(b.dataset.say)})}
+let toastT;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),1800)}
+
+// ---------- data ----------
+const seen=new Set();
+const V=VOCAB.filter(v=>{const k=v[0]+"|"+v[1];if(seen.has(k))return false;seen.add(k);return true}).map((v,i)=>({id:"v"+i,word:v[0],reading:v[1],meaning:v[2],pos:v[3],cat:v[4]}));
+const G=GRAMMAR.map((g,i)=>({id:"g"+i,...g}));
+function seededOrder(arr,seed){let x=seed;const r=()=>{x=(x*1664525+1013904223)%4294967296;return x/4294967296};const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const V_ORDER=seededOrder(V,20261104),G_ORDER=seededOrder(G,7);
+const INTERVALS=[0,1,3,7,14,30]; // 天
+const BOX_LABEL=["新/忘記","1天","3天","7天","14天","精通"];
+
+// ---------- state ----------
+const KEY="n3srs_v1";
+let S=load();
+function defaultState(){return{start:todayKey(),cards:{},days:{},settings:{newV:30,newG:6,auto:false,mute:true,rate:0.9},quiz:{total:0,correct:0}}}
+function load(){try{const r=localStorage.getItem(KEY);if(r){const s=JSON.parse(r);return Object.assign(defaultState(),s)}}catch(e){}return defaultState()}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function card(id){return S.cards[id]||(S.cards[id]={box:0,due:null,seen:0,ok:0,ng:0,first:null})}
+function isNew(id){return !S.cards[id]||S.cards[id].seen===0}
+function isDue(id){const c=S.cards[id];return c&&c.seen>0&&c.due&&c.due<=todayKey()}
+function rate(id,r){ // r: 0 again, 1 hard, 2 good
+  const c=card(id);const t=todayKey();
+  c.seen++;if(!c.first)c.first=t;
+  if(r===0){c.box=0;c.due=t;c.ng++}
+  else if(r===1){c.box=Math.max(0,c.box-0);c.due=addDays(t,1);c.ok++}
+  else{c.box=Math.min(5,c.box+1);c.due=addDays(t,INTERVALS[c.box]);c.ok++}
+  const d=S.days[t]||(S.days[t]={reviews:0,newV:0,newG:0});d.reviews++;
+  if(c.seen===1){id[0]==="v"?d.newV++:d.newG++}
+  save();
+}
+function stats(){
+  const o={vNew:0,gNew:0,vDue:0,gDue:0,vLearned:0,gLearned:0,vMaster:0,gMaster:0};
+  V.forEach(v=>{if(isNew(v.id))o.vNew++;else{o.vLearned++;if(isDue(v.id))o.vDue++;if(S.cards[v.id].box>=5)o.vMaster++}});
+  G.forEach(g=>{if(isNew(g.id))o.gNew++;else{o.gLearned++;if(isDue(g.id))o.gDue++;if(S.cards[g.id].box>=5)o.gMaster++}});
+  return o;
+}
+function streak(){let n=0,t=todayKey();if(!S.days[t]){t=addDays(t,-1)}while(S.days[t]){n++;t=addDays(t,-1)}return n}
+function todayNewLeft(){const d=S.days[todayKey()]||{newV:0,newG:0};return{v:Math.max(0,S.settings.newV-d.newV),g:Math.max(0,S.settings.newG-d.newG)}}
+
+// ---------- routing ----------
+let view="home";let session=null;let quizState=null;
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{view=b.dataset.v;render()});
+$("#mute").onclick=()=>{S.settings.mute=!S.settings.mute;save();document.body.classList.toggle("muted",!!S.settings.mute);$("#mute").textContent=S.settings.mute?"🔇":"🔊";toast(S.settings.mute?"已靜音（🔊 按鈕也不會出聲）":"聲音已開啟");if(!S.settings.mute)speak("音声オン")};
+function render(){
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.v===view));
+  document.body.classList.toggle("muted",!!S.settings.mute);
+  $("#mute").textContent=S.settings.mute?"🔇":"🔊";$("#mute").title=S.settings.mute?"目前靜音，點擊開啟聲音":"目前有聲音，點擊靜音";
+  const st=stats();$("#hdr-sub").textContent=`第 ${Math.min(30,dayDiff(S.start,todayKey())+1)} 天 · 連續 ${streak()} 天`;
+  const m=$("#main");
+  ({home:renderHome,study:renderStudy,quiz:renderQuiz,vocab:renderVocab,grammar:renderGrammar,settings:renderSettings})[view](m,st);
+  window.scrollTo(0,0);
+}
+
+// ---------- HOME ----------
+function renderHome(m,st){
+  const left=todayNewLeft();
+  const due=st.vDue+st.gDue;const newToday=Math.min(left.v,st.vNew)+Math.min(left.g,st.gNew);
+  const totalV=V.length,totalG=G.length;
+  const daysLeftV=Math.ceil(st.vNew/S.settings.newV),daysLeftG=Math.ceil(st.gNew/S.settings.newG);
+  const dayN=dayDiff(S.start,todayKey());
+  let cal="";for(let i=0;i<30;i++){const k=addDays(S.start,i);const d=S.days[k];cal+=`<div class="${d?'done':''} ${k===todayKey()?'today':''}" title="${k}">${i+1}</div>`}
+  m.innerHTML=`
+  <div class="card">
+    <h2>今天的任務</h2>
+    <div class="grid">
+      <div class="stat"><div class="n" style="color:var(--accent)">${due}</div><div class="l">到期複習</div></div>
+      <div class="stat"><div class="n" style="color:var(--blue)">${newToday}</div><div class="l">今日新項目</div></div>
+      <div class="stat"><div class="n">${streak()}</div><div class="l">連續學習天數</div></div>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn" id="go-study" ${due+newToday===0?'disabled':''}>開始今天的學習（${due+newToday} 張）</button>
+      <button class="btn secondary" id="go-quiz">快速測驗 10 題</button>
+    </div>
+    ${due+newToday===0?'<p class="muted" style="margin:10px 0 0">今天的份已完成 🎉 想多學可以到「設定」提高每日新項目數，或到「測驗」加強。</p>':''}
+  </div>
+  <div class="card">
+    <h2>整體進度</h2>
+    <div style="margin-bottom:10px"><div class="row" style="justify-content:space-between"><span>單字 ${st.vLearned}/${totalV} 已學（精通 ${st.vMaster}）</span><span class="muted">${Math.round(st.vLearned/totalV*100)}%</span></div><div class="bar"><i style="width:${st.vLearned/totalV*100}%"></i></div></div>
+    <div><div class="row" style="justify-content:space-between"><span>文法 ${st.gLearned}/${totalG} 已學（精通 ${st.gMaster}）</span><span class="muted">${Math.round(st.gLearned/totalG*100)}%</span></div><div class="bar"><i style="width:${st.gLearned/totalG*100}%;background:var(--blue)"></i></div></div>
+    <p class="muted" style="margin:12px 0 0">依目前設定（每日 ${S.settings.newV} 字 + ${S.settings.newG} 句型），剩下的新項目約 <b>${Math.max(daysLeftV,daysLeftG)} 天</b>可全部學完；之後幾天會以複習為主，到期間隔為 1→3→7→14→30 天。</p>
+  </div>
+  <div class="card">
+    <h2>30 天日曆</h2>
+    <div class="cal">${cal}</div>
+    <p class="muted" style="margin:10px 0 0">開始日 ${S.start}，今天是第 ${dayN+1} 天。綠色 = 當天有學習紀錄。</p>
+  </div>
+  <div class="card">
+    <h2>N3 範圍速覽</h2>
+    <p class="muted" style="margin:0">官方不公布正式字表，坊間統計約為：累計 <b>3,700 字</b>（N3 新增約 1,700 字）、漢字約 <b>650 個</b>、文法句型約 <b>100～120 個</b>。本 app 內建精選 <b>${totalV} 個高頻單字</b> 與 <b>${totalG} 個文法句型</b>，涵蓋歷屆最常出的範圍；單字部分建議再搭配一本 N3 單字書補足剩餘低頻字。</p>
+  </div>`;
+  $("#go-study").onclick=()=>{view="study";session=null;render()};
+  $("#go-quiz").onclick=()=>{view="quiz";quizState=null;render()};
+}
+
+// ---------- STUDY (SRS) ----------
+function buildSession(){
+  const left=todayNewLeft();
+  const dueV=V.filter(v=>isDue(v.id)),dueG=G.filter(g=>isDue(g.id));
+  const newV=V_ORDER.filter(v=>isNew(v.id)).slice(0,left.v),newG=G_ORDER.filter(g=>isNew(g.id)).slice(0,left.g);
+  const q=shuffle([...dueV,...dueG]).concat(interleave(newV,newG));
+  return{queue:q,done:0,total:q.length,flipped:false,again:[]};
+}
+function interleave(a,b){const r=[];const n=Math.max(a.length,b.length);const step=Math.ceil(a.length/(b.length||1));for(let i=0;i<a.length;i++){r.push(a[i]);if((i+1)%step===0&&b.length)r.push(b.shift())}return r.concat(b)}
+function renderStudy(m){
+  if(!session)session=buildSession();
+  if(!session.queue.length&&session.again.length){session.queue=shuffle(session.again);session.again=[]}
+  const cur=session.queue[0];
+  if(!cur){
+    m.innerHTML=`<div class="card empty"><div style="font-size:40px">🎉</div><h2>本輪完成！</h2><p class="muted">今天已複習 ${session.done} 張。明天再來，到期的卡片會自動排進來。</p>
+    <div class="row" style="justify-content:center"><button class="btn" id="b-home">回今日</button><button class="btn secondary" id="b-quiz">來個測驗</button></div></div>`;
+    $("#b-home").onclick=()=>{view="home";render()};$("#b-quiz").onclick=()=>{view="quiz";quizState=null;render()};return;
+  }
+  const isV=cur.id[0]==="v";const c=S.cards[cur.id];const box=c?c.box:0;const fresh=isNew(cur.id);
+  const prog=session.done/(session.done+session.queue.length+session.again.length)*100;
+  m.innerHTML=`
+  <div class="row" style="justify-content:space-between;margin-bottom:8px"><span class="muted">${session.done} / ${session.done+session.queue.length+session.again.length}</span>
+  <span><span class="pill ${fresh?'':'box'+box}">${fresh?'新項目':'複習 · '+BOX_LABEL[box]}</span></span></div>
+  <div class="bar" style="margin-bottom:12px"><i style="width:${prog}%"></i></div>
+  <div class="card fc jp" id="fc">
+    <div class="kind">${isV?cur.cat+' · '+cur.pos:'文法 · '+cur.g}</div>
+    <div class="front ${isV?'':'g'}">${esc(isV?cur.word:cur.p)}</div>
+    ${session.flipped?backHTML(cur):'<div class="hint">點擊卡片或按空白鍵翻面</div>'}
+  </div>
+  ${session.flipped?`<div class="rate">
+    <button class="again" data-r="0">忘了<small>再出現一次</small></button>
+    <button class="hard" data-r="1">有點模糊<small>明天再看</small></button>
+    <button class="good" data-r="2">記住了<small>${INTERVALS[Math.min(5,box+1)]} 天後</small></button>
+  </div><div class="kbd">鍵盤：1 忘了 · 2 模糊 · 3 記住了</div>`:''}`;
+  $("#fc").onclick=()=>{if(!session.flipped){session.flipped=true;render();if(S.settings.auto)speak(isV?cur.reading:cur.e)}};
+  bindSpk();
+  document.querySelectorAll(".rate button").forEach(b=>b.onclick=()=>answer(+b.dataset.r));
+}
+function backHTML(cur){
+  if(cur.id[0]==="v")return`<div class="back"><div class="reading">${esc(cur.reading)}${spk(cur.reading)}</div><div class="meaning">${esc(cur.meaning)}</div></div>`;
+  return`<div class="back"><div class="meaning">${esc(cur.m)}</div><div class="form">接續：${esc(cur.f)}</div><div class="ex">${esc(cur.e)}${spk(cur.e)}<small>${esc(cur.t)}</small></div></div>`;
+}
+function answer(r){
+  const cur=session.queue.shift();rate(cur.id,r);
+  if(r===0)session.again.push(cur);else session.done++;
+  session.flipped=false;render();
+}
+document.addEventListener("keydown",e=>{
+  if(view!=="study"||!session||!session.queue.length)return;
+  if(e.code==="Space"&&!session.flipped){e.preventDefault();const c=session.queue[0];session.flipped=true;render();if(S.settings.auto)speak(c.id[0]==="v"?c.reading:c.e)}
+  else if(session.flipped&&["1","2","3"].includes(e.key))answer(+e.key-1);
+});
+
+// ---------- QUIZ ----------
+function makeQuestion(type){
+  // pool: 優先已學過的
+  if(type==="g"){
+    let pool=G.filter(g=>!isNew(g.id));if(pool.length<8)pool=G;
+    const a=pool[Math.floor(Math.random()*pool.length)];
+    const core=a.p.split(/ \/ |／/)[0].replace(/[～（）()\s]/g,"").replace(/^[^ぁ-んァ-ン一-龥]+/,"");
+    let qText,sub;
+    if(core.length>=2&&a.e.includes(core)){qText=a.e.replace(core,"＿＿＿");sub=a.t}
+    else{qText=a.t;sub="哪個句型的意思是「"+a.m+"」？"}
+    const opts=shuffle([a,...sample(G,3,a)]);
+    return{id:a.id,q:qText,sub,opts:opts.map(o=>({t:o.p,ok:o===a})),ansText:a.p+" — "+a.m,say:a.e}
+  }
+  let pool=V.filter(v=>!isNew(v.id));if(pool.length<8)pool=V;
+  const a=pool[Math.floor(Math.random()*pool.length)];
+  const same=V.filter(v=>v.cat===a.cat);
+  const d=sample(same.length>=4?same:V,3,a);
+  if(type==="m"){return{id:a.id,q:a.word,sub:"這個字的意思是？",opts:shuffle([a,...d]).map(o=>({t:o.meaning,ok:o===a})),ansText:a.word+"（"+a.reading+"）"+a.meaning,say:a.reading}}
+  if(type==="r"){return{id:a.id,q:a.word,sub:"這個字怎麼讀？",opts:shuffle([a,...d]).map(o=>({t:o.reading,ok:o===a})),ansText:a.word+"（"+a.reading+"）"+a.meaning,say:a.reading}}
+  return{id:a.id,q:a.meaning,sub:"對應的日文是？",opts:shuffle([a,...d]).map(o=>({t:o.word,ok:o===a})),ansText:a.word+"（"+a.reading+"）"+a.meaning,say:a.reading}
+}
+function renderQuiz(m){
+  if(!quizState){
+    m.innerHTML=`<div class="card"><h2>測驗模式</h2><p class="muted">10 題選擇題。答錯的項目會自動排回今天的複習。已學過的項目會優先出題。</p>
+    <div class="grid">
+      <button class="btn secondary" data-t="mix">綜合（推薦）</button>
+      <button class="btn secondary" data-t="m">單字 → 意思</button>
+      <button class="btn secondary" data-t="r">單字 → 讀音</button>
+      <button class="btn secondary" data-t="w">意思 → 單字</button>
+      <button class="btn secondary" data-t="g">文法句型</button>
+    </div>
+    <p class="muted" style="margin:14px 0 0">累計：${S.quiz.total} 題，正確率 ${S.quiz.total?Math.round(S.quiz.correct/S.quiz.total*100):0}%</p></div>`;
+    document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{startQuiz(b.dataset.t)});return;
+  }
+  const qs=quizState;
+  if(qs.i>=qs.qs.length){
+    m.innerHTML=`<div class="card empty"><div style="font-size:40px">${qs.score>=8?'🏆':qs.score>=5?'👍':'💪'}</div><h2>${qs.score} / ${qs.qs.length}</h2>
+    <p class="muted">${qs.wrong.length?'答錯的：':'全對！'}</p>
+    <div style="text-align:left">${qs.wrong.map(w=>`<div class="item"><div><span class="w jp">${esc(w)}</span></div></div>`).join("")}</div>
+    <div class="row" style="justify-content:center;margin-top:14px"><button class="btn" id="q-again">再來 10 題</button><button class="btn secondary" id="q-home">回今日</button></div></div>`;
+    $("#q-again").onclick=()=>startQuiz(qs.type);$("#q-home").onclick=()=>{view="home";render()};return;
+  }
+  const q=qs.qs[qs.i];
+  m.innerHTML=`<div class="row" style="justify-content:space-between;margin-bottom:8px"><span class="muted">第 ${qs.i+1} / ${qs.qs.length} 題</span><span class="muted">得分 ${qs.score}</span></div>
+  <div class="bar" style="margin-bottom:12px"><i style="width:${qs.i/qs.qs.length*100}%"></i></div>
+  <div class="card"><div class="q jp">${esc(q.q)}<small>${esc(q.sub)}</small></div>
+  <div class="opts jp" id="opts">${q.opts.map((o,i)=>`<button data-i="${i}">${esc(o.t)}</button>`).join("")}</div>
+  <div id="fb" style="margin-top:12px"></div></div>`;
+  document.querySelectorAll("#opts button").forEach(b=>b.onclick=()=>{
+    const i=+b.dataset.i;const ok=q.opts[i].ok;
+    document.querySelectorAll("#opts button").forEach((x,j)=>{x.disabled=true;if(q.opts[j].ok)x.classList.add("correct");else if(j===i)x.classList.add("wrong")});
+    S.quiz.total++;if(ok){S.quiz.correct++;qs.score++}else{qs.wrong.push(q.ansText);const c=card(q.id);if(c.seen>0){c.box=0;c.due=todayKey()}}
+    save();
+    $("#fb").innerHTML=`<div class="muted">${ok?'✅ 正確！':'❌ '}${esc(q.ansText)}${spk(q.say)}</div><div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn small" id="next">下一題 →</button></div>`;
+    bindSpk();if(S.settings.auto)speak(q.say);
+    $("#next").onclick=()=>{qs.i++;render()};
+  });
+}
+function startQuiz(type){
+  const types=type==="mix"?["m","r","w","g","m","g","w","r","m","g"]:Array(10).fill(type);
+  quizState={type,i:0,score:0,wrong:[],qs:shuffle(types).map(makeQuestion)};render();
+}
+
+// ---------- VOCAB LIST ----------
+let vFilter={cat:"全部",q:"",only:"all"};
+function renderVocab(m){
+  const cats=["全部",...new Set(V.map(v=>v.cat))];
+  const list=V.filter(v=>(vFilter.cat==="全部"||v.cat===vFilter.cat)&&(!vFilter.q||(v.word+v.reading+v.meaning).includes(vFilter.q))&&(vFilter.only==="all"||(vFilter.only==="new"?isNew(v.id):(vFilter.only==="weak"?(S.cards[v.id]&&S.cards[v.id].seen>0&&S.cards[v.id].box<=1):!isNew(v.id)))));
+  m.innerHTML=`<input class="search" id="vq" placeholder="搜尋單字 / 讀音 / 中文…" value="${esc(vFilter.q)}">
+  <div class="chips">${cats.map(c=>`<button data-c="${c}" class="${vFilter.cat===c?'on':''}">${c}</button>`).join("")}</div>
+  <div class="chips">${[["all","全部"],["new","未學"],["learned","已學"],["weak","不熟"]].map(([k,l])=>`<button data-o="${k}" class="${vFilter.only===k?'on':''}">${l}</button>`).join("")}</div>
+  <div class="card"><div class="muted" style="margin-bottom:6px">${list.length} 個</div>
+  ${list.map(v=>{const c=S.cards[v.id];return`<div class="item"><div><span class="w jp">${esc(v.word)}</span><span class="r jp">${esc(v.reading)}</span>${spk(v.reading)}<div class="m">${esc(v.meaning)}</div></div><div class="right"><span class="pill ${c&&c.seen?'box'+c.box:''}">${c&&c.seen?BOX_LABEL[c.box]:'未學'}</span>${c&&c.seen?`<div class="muted">下次 ${c.due}</div>`:''}</div></div>`}).join("")||'<div class="empty">沒有符合的單字</div>'}</div>`;
+  bindSpk();
+  $("#vq").oninput=e=>{vFilter.q=e.target.value;renderVocab(m);$("#vq").focus();const el=$("#vq");el.setSelectionRange(el.value.length,el.value.length)};
+  document.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{vFilter.cat=b.dataset.c;render()});
+  document.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{vFilter.only=b.dataset.o;render()});
+}
+
+// ---------- GRAMMAR LIST ----------
+let gFilter={g:"全部",q:""};
+function renderGrammar(m){
+  const groups=["全部",...new Set(G.map(g=>g.g))];
+  const list=G.filter(g=>(gFilter.g==="全部"||g.g===gFilter.g)&&(!gFilter.q||(g.p+g.m+g.e).includes(gFilter.q)));
+  m.innerHTML=`<input class="search" id="gq" placeholder="搜尋句型 / 意思…" value="${esc(gFilter.q)}">
+  <div class="chips">${groups.map(c=>`<button data-g="${c}" class="${gFilter.g===c?'on':''}">${c}</button>`).join("")}</div>
+  <div class="card"><div class="muted" style="margin-bottom:6px">${list.length} 個句型</div>
+  ${list.map(g=>{const c=S.cards[g.id];return`<div class="gitem"><div class="row" style="justify-content:space-between"><span class="p jp">${esc(g.p)}</span><span class="pill ${c&&c.seen?'box'+c.box:''}">${c&&c.seen?BOX_LABEL[c.box]:'未學'}</span></div>
+  <div class="m">${esc(g.m)}</div><details><summary>接續與例句</summary><div class="muted">接續：${esc(g.f)}</div><div class="ex jp">${esc(g.e)}${spk(g.e)}<small>${esc(g.t)}</small></div></details></div>`}).join("")}</div>`;
+  bindSpk();
+  $("#gq").oninput=e=>{gFilter.q=e.target.value;renderGrammar(m);$("#gq").focus();const el=$("#gq");el.setSelectionRange(el.value.length,el.value.length)};
+  document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{gFilter.g=b.dataset.g;render()});
+}
+
+// ---------- SETTINGS ----------
+function renderSettings(m){
+  m.innerHTML=`<div class="card"><h2>每日新項目</h2>
+  <div class="row">單字 <input type="number" id="s-v" min="0" max="100" value="${S.settings.newV}"> 個 ／ 文法 <input type="number" id="s-g" min="0" max="30" value="${S.settings.newG}"> 個</div>
+  <p class="muted">建議：想在 30 天內學完全部內建內容，單字 ≥ ${Math.ceil(V.length/30)}、文法 ≥ ${Math.ceil(G.length/30)}。但要留 5～7 天純複習，所以預設略高一點。</p>
+  <button class="btn small" id="s-save">儲存</button></div>
+  <div class="card"><h2>語音朗讀</h2>
+  <p class="muted" style="margin-top:0">右上角 🔇/🔊 是總開關。靜音時整個網站不會發出任何聲音，🔊 按鈕也會隱藏。</p><div class="row"><label><input type="checkbox" id="s-auto" ${S.settings.auto?'checked':''}> 聲音開啟時，翻面／答題後自動朗讀</label></div>
+  <div class="row" style="margin-top:8px">語速 <input type="range" id="s-rate" min="0.5" max="1.3" step="0.1" value="${S.settings.rate||0.9}"> <span id="s-rate-v">${S.settings.rate||0.9}</span></div>
+  <div class="row" style="margin-top:8px"><button class="btn small secondary" id="s-test">試聽：日本語を勉強しています</button></div>
+  <p class="muted">使用瀏覽器內建語音（不需網路）。iPhone/Mac 的 Safari、Android 的 Chrome 通常已內建日文聲音；Windows 需在系統語言設定安裝「日本語」語音包。目前偵測到：<span id="s-voice">${jaVoice?esc(jaVoice.name):'（尚未偵測到日文語音）'}</span></p></div>
+  <div class="card"><h2>備份 / 還原進度</h2>
+  <p class="muted">進度存在這個瀏覽器裡。換裝置或清快取前，請先複製下方 JSON 存起來；到新裝置貼回來再按「匯入」。</p>
+  <textarea id="exp" readonly>${esc(JSON.stringify(S))}</textarea>
+  <div class="row" style="margin-top:8px"><button class="btn small secondary" id="copy">複製進度</button></div>
+  <textarea id="imp" placeholder="在這裡貼上之前匯出的 JSON…" style="margin-top:14px"></textarea>
+  <div class="row" style="margin-top:8px"><button class="btn small" id="import">匯入</button></div></div>
+  <div class="card"><h2>重設</h2><p class="muted">清除所有學習紀錄，並把開始日設為今天。</p><button class="btn small" style="background:var(--bad)" id="reset">重設全部進度</button></div>
+  <div class="card"><h2>使用建議</h2>
+  <ul class="muted" style="margin:0;padding-left:18px;line-height:1.8">
+  <li>每天 15～20 分鐘：先做「學習」把到期卡清完，再做一輪 10 題測驗。</li>
+  <li>按「忘了」的卡會在同一輪再出現；按「記住了」會依 1→3→7→14→30 天的間隔回來。</li>
+  <li>預設每天 30 字 + 6 句型，約 25 天學完；第 26～30 天把新項目設 0，全力複習與測驗。每天約 20～30 分鐘。</li>
+  <li>文法請連例句一起唸出來，N3 讀解與聽解很吃句型的「語感」。</li>
+  </ul></div>`;
+  $("#s-save").onclick=()=>{S.settings.newV=+$("#s-v").value||0;S.settings.newG=+$("#s-g").value||0;save();toast("已儲存")};
+  $("#s-auto").onchange=e=>{S.settings.auto=e.target.checked;save()};
+  $("#s-rate").oninput=e=>{S.settings.rate=+e.target.value;$("#s-rate-v").textContent=e.target.value;save()};
+  $("#s-test").onclick=()=>{pickVoice();$("#s-voice").textContent=jaVoice?jaVoice.name:'（尚未偵測到日文語音）';speak("日本語を勉強しています")};
+  $("#copy").onclick=async()=>{try{await navigator.clipboard.writeText(JSON.stringify(S));toast("已複製到剪貼簿")}catch(e){$("#exp").select();toast("請手動全選複製")}};
+  $("#import").onclick=()=>{try{const s=JSON.parse($("#imp").value);if(!s.cards)throw 0;S=Object.assign(defaultState(),s);save();toast("已匯入");render()}catch(e){toast("格式不正確")}};
+  $("#reset").onclick=()=>{if($("#reset").dataset.c){S=defaultState();save();session=null;toast("已重設");view="home";render()}else{$("#reset").dataset.c=1;$("#reset").textContent="確定要重設？再按一次";}};
+}
+
+render();
+if("serviceWorker" in navigator&&location.protocol==="https:"&&!location.hostname.endsWith("claude.ai")&&!location.hostname.includes("claudeusercontent")){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+</script>
+</body>
+</html>

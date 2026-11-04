@@ -151,17 +151,17 @@ let toastT;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add
 
 // ---------- data ----------
 const seen=new Set();
-const V=VOCAB.filter(v=>{const k=v[0]+"|"+v[1];if(seen.has(k))return false;seen.add(k);return true}).map((v,i)=>({id:"v"+i,word:v[0],reading:v[1],meaning:v[2],pos:v[3],cat:v[4]}));
+const V=VOCAB.filter(v=>{const k=v[0]+"|"+v[1];if(seen.has(k))return false;seen.add(k);return true}).map((v,i)=>({id:v[5]?.id||"v"+i,word:v[0],reading:v[1],meaning:v[2],pos:v[3],cat:v[4],note:v[5]?.n||"",example:v[5]?.e||"",translation:v[5]?.t||"",scene:v[5]?.scene||""}));
 const G=GRAMMAR.map((g,i)=>({id:"g"+i,...g}));
 function seededOrder(arr,seed){let x=seed;const r=()=>{x=(x*1664525+1013904223)%4294967296;return x/4294967296};const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 const V_ORDER=seededOrder(V,20261104),G_ORDER=seededOrder(G,7);
 const INTERVALS=[0,1,3,7,14,30]; // 天
-const BOX_LABEL=["新/忘記","1天","3天","7天","14天","精通"];
+const BOX_LABEL=["新/忘記","1天","3天","7天","14天","熟練"];
 
 // ---------- state ----------
 const KEY="n3srs_v1";
 let S=load();
-function defaultState(){return{start:todayKey(),cards:{},days:{},settings:{newV:30,newG:6,auto:false,mute:true,rate:0.9},quiz:{total:0,correct:0}}}
+function defaultState(){return{start:todayKey(),cards:{},days:{},settings:{newV:20,newG:3,auto:false,mute:true,rate:0.9},quiz:{total:0,correct:0}}}
 function load(){try{const r=localStorage.getItem(KEY);if(r){const s=JSON.parse(r);return Object.assign(defaultState(),s)}}catch(e){}return defaultState()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
 function card(id){return S.cards[id]||(S.cards[id]={box:0,due:null,seen:0,ok:0,ng:0,first:null})}
@@ -189,14 +189,14 @@ function todayNewLeft(){const d=S.days[todayKey()]||{newV:0,newG:0};return{v:Mat
 // ---------- routing ----------
 let view="home";let session=null;let quizState=null;
 document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{view=b.dataset.v;render()});
-$("#mute").onclick=()=>{S.settings.mute=!S.settings.mute;save();document.body.classList.toggle("muted",!!S.settings.mute);$("#mute").textContent=S.settings.mute?"🔇":"🔊";toast(S.settings.mute?"已靜音（🔊 按鈕也不會出聲）":"聲音已開啟");if(!S.settings.mute)speak("音声オン")};
+$("#mute").onclick=()=>{S.settings.mute=!S.settings.mute;if(S.settings.mute&&"speechSynthesis" in window)speechSynthesis.cancel();save();document.body.classList.toggle("muted",!!S.settings.mute);$("#mute").textContent=S.settings.mute?"🔇":"🔊";toast(S.settings.mute?"已靜音（🔊 按鈕也不會出聲）":"聲音已開啟");if(!S.settings.mute)speak("音声オン")};
 function render(){
   document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.v===view));
   document.body.classList.toggle("muted",!!S.settings.mute);
   $("#mute").textContent=S.settings.mute?"🔇":"🔊";$("#mute").title=S.settings.mute?"目前靜音，點擊開啟聲音":"目前有聲音，點擊靜音";
   const st=stats();$("#hdr-sub").textContent=`第 ${Math.min(30,dayDiff(S.start,todayKey())+1)} 天 · 連續 ${streak()} 天`;
   const m=$("#main");
-  ({home:renderHome,study:renderStudy,quiz:renderQuiz,vocab:renderVocab,grammar:renderGrammar,settings:renderSettings})[view](m,st);
+  ({home:renderHome,study:renderStudy,quiz:renderQuiz,vocab:renderVocab,grammar:renderGrammar,settings:renderSettings,training:renderTraining})[view](m,st);
   window.scrollTo(0,0);
 }
 
@@ -224,8 +224,8 @@ function renderHome(m,st){
   </div>
   <div class="card">
     <h2>整體進度</h2>
-    <div style="margin-bottom:10px"><div class="row" style="justify-content:space-between"><span>單字 ${st.vLearned}/${totalV} 已學（精通 ${st.vMaster}）</span><span class="muted">${Math.round(st.vLearned/totalV*100)}%</span></div><div class="bar"><i style="width:${st.vLearned/totalV*100}%"></i></div></div>
-    <div><div class="row" style="justify-content:space-between"><span>文法 ${st.gLearned}/${totalG} 已學（精通 ${st.gMaster}）</span><span class="muted">${Math.round(st.gLearned/totalG*100)}%</span></div><div class="bar"><i style="width:${st.gLearned/totalG*100}%;background:var(--blue)"></i></div></div>
+    <div style="margin-bottom:10px"><div class="row" style="justify-content:space-between"><span>單字 ${st.vLearned}/${totalV} 已學（熟練 ${st.vMaster}）</span><span class="muted">${Math.round(st.vLearned/totalV*100)}%</span></div><div class="bar"><i style="width:${st.vLearned/totalV*100}%"></i></div></div>
+    <div><div class="row" style="justify-content:space-between"><span>文法 ${st.gLearned}/${totalG} 已學（熟練 ${st.gMaster}）</span><span class="muted">${Math.round(st.gLearned/totalG*100)}%</span></div><div class="bar"><i style="width:${st.gLearned/totalG*100}%;background:var(--blue)"></i></div></div>
     <p class="muted" style="margin:12px 0 0">依目前設定（每日 ${S.settings.newV} 字 + ${S.settings.newG} 句型），剩下的新項目約 <b>${Math.max(daysLeftV,daysLeftG)} 天</b>可全部學完；之後幾天會以複習為主，到期間隔為 1→3→7→14→30 天。</p>
   </div>
   <div class="card">
@@ -235,7 +235,7 @@ function renderHome(m,st){
   </div>
   <div class="card">
     <h2>N3 範圍速覽</h2>
-    <p class="muted" style="margin:0">官方不公布正式字表，坊間統計約為：累計 <b>3,700 字</b>（N3 新增約 1,700 字）、漢字約 <b>650 個</b>、文法句型約 <b>100～120 個</b>。本 app 內建精選 <b>${totalV} 個高頻單字</b> 與 <b>${totalG} 個文法句型</b>，涵蓋歷屆最常出的範圍；單字部分建議再搭配一本 N3 單字書補足剩餘低頻字。</p>
+    <p class="muted" style="margin:0">官方不公布正式字表，坊間統計約為：累計 <b>3,700 字</b>（N3 新增約 1,700 字）、漢字約 <b>650 個</b>、文法句型約 <b>100～120 個</b>。本 app 內建精選 <b>${totalV} 個高頻單字</b> 與 <b>${totalG} 個文法句型</b>，屬於複習用選集，不代表官方完整範圍；請搭配閱讀、聽力及官方練習題。</p>
   </div>`;
   $("#go-study").onclick=()=>{view="study";session=null;render()};
   $("#go-quiz").onclick=()=>{view="quiz";quizState=null;render()};
@@ -243,7 +243,7 @@ function renderHome(m,st){
 
 // ---------- STUDY (SRS) ----------
 function buildSession(){
-  const left=todayNewLeft();
+  const left=sprintAllowance();
   const dueV=V.filter(v=>isDue(v.id)),dueG=G.filter(g=>isDue(g.id));
   const newV=V_ORDER.filter(v=>isNew(v.id)).slice(0,left.v),newG=G_ORDER.filter(g=>isNew(g.id)).slice(0,left.g);
   const q=shuffle([...dueV,...dueG]).concat(interleave(newV,newG));
@@ -279,9 +279,10 @@ function renderStudy(m){
   bindSpk();
   document.querySelectorAll(".rate button").forEach(b=>b.onclick=()=>answer(+b.dataset.r));
 }
+function vocabDetail(v){return `${v.example?`<div class="ex jp">${esc(v.example)}${spk(v.example)}<small>${esc(v.translation)}</small></div>`:""}${v.note?`<p class="muted">用法提醒：${esc(v.note)}</p>`:""}`;}
 function backHTML(cur){
-  if(cur.id[0]==="v")return`<div class="back"><div class="reading">${esc(cur.reading)}${spk(cur.reading)}</div><div class="meaning">${esc(cur.meaning)}</div></div>`;
-  return`<div class="back"><div class="meaning">${esc(cur.m)}</div><div class="form">接續：${esc(cur.f)}</div><div class="ex">${esc(cur.e)}${spk(cur.e)}<small>${esc(cur.t)}</small></div></div>`;
+  if(cur.id[0]==="v")return`<div class="back"><div class="reading">${esc(cur.reading)}${spk(cur.reading)}</div><div class="meaning">${esc(cur.meaning)}</div><p class="muted" style="text-align:center">${esc(cur.pos)}${cur.scene?" · "+esc(cur.scene):""}</p>${vocabDetail(cur)}</div>`;
+  return`<div class="back"><div class="meaning">${esc(cur.m)}</div><div class="form">接續：${esc(cur.f)}</div><div class="ex">${esc(cur.e)}${spk(cur.e)}<small>${esc(cur.t)}</small></div>${cur.n?`<p class="muted">辨析：${esc(cur.n)}</p>`:""}</div>`;
 }
 function answer(r){
   const cur=session.queue.shift();rate(cur.id,r);
@@ -310,9 +311,11 @@ function makeQuestion(type){
   let pool=V.filter(v=>!isNew(v.id));if(pool.length<8)pool=V;
   const a=pool[Math.floor(Math.random()*pool.length)];
   const same=V.filter(v=>v.cat===a.cat);
-  const d=sample(same.length>=4?same:V,3,a);
-  if(type==="m"){return{id:a.id,q:a.word,sub:"這個字的意思是？",opts:shuffle([a,...d]).map(o=>({t:o.meaning,ok:o===a})),ansText:a.word+"（"+a.reading+"）"+a.meaning,say:a.reading}}
-  if(type==="r"){return{id:a.id,q:a.word,sub:"這個字怎麼讀？",opts:shuffle([a,...d]).map(o=>({t:o.reading,ok:o===a})),ansText:a.word+"（"+a.reading+"）"+a.meaning,say:a.reading}}
+  const choiceField=type==="m"?"meaning":type==="r"?"reading":"word";
+  const distinct=items=>items.filter((x,i,all)=>x.id!==a.id&&x[choiceField]!==a[choiceField]&&all.findIndex(y=>y[choiceField]===x[choiceField])===i);
+  const local=distinct(same);const d=shuffle(local.length>=3?local:distinct(V)).slice(0,3);
+  if(type==="m"){return{id:a.id,q:a.word+"（"+a.reading+"）",sub:"這個字的意思是？",opts:shuffle([a,...d]).map(o=>({t:o.meaning,ok:o===a})),ansText:a.word+"（"+a.reading+"）"+a.meaning,say:a.reading}}
+  if(type==="r"){return{id:a.id,q:a.word,sub:"這個字怎麼讀？（"+a.meaning+"）",opts:shuffle([a,...d]).map(o=>({t:o.reading,ok:o===a})),ansText:a.word+"（"+a.reading+"）"+a.meaning,say:a.reading}}
   return{id:a.id,q:a.meaning,sub:"對應的日文是？",opts:shuffle([a,...d]).map(o=>({t:o.word,ok:o===a})),ansText:a.word+"（"+a.reading+"）"+a.meaning,say:a.reading}
 }
 function renderQuiz(m){
@@ -345,7 +348,7 @@ function renderQuiz(m){
   document.querySelectorAll("#opts button").forEach(b=>b.onclick=()=>{
     const i=+b.dataset.i;const ok=q.opts[i].ok;
     document.querySelectorAll("#opts button").forEach((x,j)=>{x.disabled=true;if(q.opts[j].ok)x.classList.add("correct");else if(j===i)x.classList.add("wrong")});
-    S.quiz.total++;if(ok){S.quiz.correct++;qs.score++}else{qs.wrong.push(q.ansText);const c=card(q.id);if(c.seen>0){c.box=0;c.due=todayKey()}}
+    S.quiz.total++;if(ok){S.quiz.correct++;qs.score++}else{qs.wrong.push(q.ansText);const c=card(q.id);if(c.seen===0)c.seen=1;c.box=0;c.due=todayKey();}
     save();
     $("#fb").innerHTML=`<div class="muted">${ok?'✅ 正確！':'❌ '}${esc(q.ansText)}${spk(q.say)}</div><div class="row" style="justify-content:flex-end;margin-top:8px"><button class="btn small" id="next">下一題 →</button></div>`;
     bindSpk();if(S.settings.auto)speak(q.say);
@@ -358,16 +361,18 @@ function startQuiz(type){
 }
 
 // ---------- VOCAB LIST ----------
-let vFilter={cat:"全部",q:"",only:"all"};
+let vFilter={cat:"全部",q:"",only:"all",scene:"全部"};
 function renderVocab(m){
   const cats=["全部",...new Set(V.map(v=>v.cat))];
-  const list=V.filter(v=>(vFilter.cat==="全部"||v.cat===vFilter.cat)&&(!vFilter.q||(v.word+v.reading+v.meaning).includes(vFilter.q))&&(vFilter.only==="all"||(vFilter.only==="new"?isNew(v.id):(vFilter.only==="weak"?(S.cards[v.id]&&S.cards[v.id].seen>0&&S.cards[v.id].box<=1):!isNew(v.id)))));
+  const list=V.filter(v=>(vFilter.scene==="全部"||v.scene===vFilter.scene)&&(vFilter.cat==="全部"||v.cat===vFilter.cat)&&(!vFilter.q||(v.word+v.reading+v.meaning+v.scene+v.example).includes(vFilter.q))&&(vFilter.only==="all"||(vFilter.only==="new"?isNew(v.id):(vFilter.only==="weak"?(S.cards[v.id]&&S.cards[v.id].seen>0&&S.cards[v.id].box<=1):!isNew(v.id)))));
   m.innerHTML=`<input class="search" id="vq" placeholder="搜尋單字 / 讀音 / 中文…" value="${esc(vFilter.q)}">
+  <label class="muted">生活情境 <select id="vscene"><option value="全部">全部</option>${[...new Set(V.map(v=>v.scene).filter(Boolean))].map(x=>`<option value="${esc(x)}" ${vFilter.scene===x?"selected":""}>${esc(x)}</option>`).join("")}</select></label>
   <div class="chips">${cats.map(c=>`<button data-c="${c}" class="${vFilter.cat===c?'on':''}">${c}</button>`).join("")}</div>
   <div class="chips">${[["all","全部"],["new","未學"],["learned","已學"],["weak","不熟"]].map(([k,l])=>`<button data-o="${k}" class="${vFilter.only===k?'on':''}">${l}</button>`).join("")}</div>
   <div class="card"><div class="muted" style="margin-bottom:6px">${list.length} 個</div>
-  ${list.map(v=>{const c=S.cards[v.id];return`<div class="item"><div><span class="w jp">${esc(v.word)}</span><span class="r jp">${esc(v.reading)}</span>${spk(v.reading)}<div class="m">${esc(v.meaning)}</div></div><div class="right"><span class="pill ${c&&c.seen?'box'+c.box:''}">${c&&c.seen?BOX_LABEL[c.box]:'未學'}</span>${c&&c.seen?`<div class="muted">下次 ${c.due}</div>`:''}</div></div>`}).join("")||'<div class="empty">沒有符合的單字</div>'}</div>`;
+  ${list.map(v=>{const c=S.cards[v.id];return`<div class="item"><div><span class="w jp">${esc(v.word)}</span><span class="r jp">${esc(v.reading)}</span>${spk(v.reading)}<div class="m">${esc(v.meaning)}</div><div class="muted">${esc(v.pos)}${v.scene?" · "+esc(v.scene):""}</div>${v.example||v.note?`<details><summary>例句與用法</summary>${vocabDetail(v)}</details>`:""}</div><div class="right"><span class="pill ${c&&c.seen?'box'+c.box:''}">${c&&c.seen?BOX_LABEL[c.box]:'未學'}</span>${c&&c.seen?`<div class="muted">下次 ${c.due}</div>`:''}</div></div>`}).join("")||'<div class="empty">沒有符合的單字</div>'}</div>`;
   bindSpk();
+  $("#vscene").onchange=e=>{vFilter.scene=e.target.value;render()};
   $("#vq").oninput=e=>{vFilter.q=e.target.value;renderVocab(m);$("#vq").focus();const el=$("#vq");el.setSelectionRange(el.value.length,el.value.length)};
   document.querySelectorAll("[data-c]").forEach(b=>b.onclick=()=>{vFilter.cat=b.dataset.c;render()});
   document.querySelectorAll("[data-o]").forEach(b=>b.onclick=()=>{vFilter.only=b.dataset.o;render()});
@@ -382,7 +387,7 @@ function renderGrammar(m){
   <div class="chips">${groups.map(c=>`<button data-g="${c}" class="${gFilter.g===c?'on':''}">${c}</button>`).join("")}</div>
   <div class="card"><div class="muted" style="margin-bottom:6px">${list.length} 個句型</div>
   ${list.map(g=>{const c=S.cards[g.id];return`<div class="gitem"><div class="row" style="justify-content:space-between"><span class="p jp">${esc(g.p)}</span><span class="pill ${c&&c.seen?'box'+c.box:''}">${c&&c.seen?BOX_LABEL[c.box]:'未學'}</span></div>
-  <div class="m">${esc(g.m)}</div><details><summary>接續與例句</summary><div class="muted">接續：${esc(g.f)}</div><div class="ex jp">${esc(g.e)}${spk(g.e)}<small>${esc(g.t)}</small></div></details></div>`}).join("")}</div>`;
+  <div class="m">${esc(g.m)}</div><details><summary>接續與例句</summary><div class="muted">接續：${esc(g.f)}</div><div class="ex jp">${esc(g.e)}${spk(g.e)}<small>${esc(g.t)}</small></div>${g.n?`<p class="muted">辨析：${esc(g.n)}</p>`:""}</details></div>`}).join("")}</div>`;
   bindSpk();
   $("#gq").oninput=e=>{gFilter.q=e.target.value;renderGrammar(m);$("#gq").focus();const el=$("#gq");el.setSelectionRange(el.value.length,el.value.length)};
   document.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{gFilter.g=b.dataset.g;render()});
@@ -392,7 +397,7 @@ function renderGrammar(m){
 function renderSettings(m){
   m.innerHTML=`<div class="card"><h2>每日新項目</h2>
   <div class="row">單字 <input type="number" id="s-v" min="0" max="100" value="${S.settings.newV}"> 個 ／ 文法 <input type="number" id="s-g" min="0" max="30" value="${S.settings.newG}"> 個</div>
-  <p class="muted">建議：想在 30 天內學完全部內建內容，單字 ≥ ${Math.ceil(V.length/30)}、文法 ≥ ${Math.ceil(G.length/30)}。但要留 5～7 天純複習，所以預設略高一點。</p>
+  <p class="muted">設定每日新項目上限。衝刺課表會依日期與到期複習量減量；11/26 起停止新增，保留時間檢討與模考。</p>
   <button class="btn small" id="s-save">儲存</button></div>
   <div class="card"><h2>語音朗讀</h2>
   <p class="muted" style="margin-top:0">右上角 🔇/🔊 是總開關。靜音時整個網站不會發出任何聲音，🔊 按鈕也會隱藏。</p><div class="row"><label><input type="checkbox" id="s-auto" ${S.settings.auto?'checked':''}> 聲音開啟時，翻面／答題後自動朗讀</label></div>
@@ -408,20 +413,24 @@ function renderSettings(m){
   <div class="card"><h2>重設</h2><p class="muted">清除所有學習紀錄，並把開始日設為今天。</p><button class="btn small" style="background:var(--bad)" id="reset">重設全部進度</button></div>
   <div class="card"><h2>使用建議</h2>
   <ul class="muted" style="margin:0;padding-left:18px;line-height:1.8">
-  <li>每天 15～20 分鐘：先做「學習」把到期卡清完，再做一輪 10 題測驗。</li>
+  <li>每天至少 90 分鐘，拆成通勤聽力、上班靜音與晚間整合。</li>
   <li>按「忘了」的卡會在同一輪再出現；按「記住了」會依 1→3→7→14→30 天的間隔回來。</li>
-  <li>預設每天 30 字 + 6 句型，約 25 天學完；第 26～30 天把新項目設 0，全力複習與測驗。每天約 20～30 分鐘。</li>
+  <li>每日新項目為上限；11/20 起減量、11/26 起停止新增。到期複習多時自動減量。</li>
   <li>文法請連例句一起唸出來，N3 讀解與聽解很吃句型的「語感」。</li>
   </ul></div>`;
-  $("#s-save").onclick=()=>{S.settings.newV=+$("#s-v").value||0;S.settings.newG=+$("#s-g").value||0;save();toast("已儲存")};
+  $("#s-save").onclick=()=>{S.settings.newV=Math.max(0,Math.min(100,Math.floor(+$("#s-v").value||0)));S.settings.newG=Math.max(0,Math.min(30,Math.floor(+$("#s-g").value||0)));save();toast("已儲存")};
   $("#s-auto").onchange=e=>{S.settings.auto=e.target.checked;save()};
   $("#s-rate").oninput=e=>{S.settings.rate=+e.target.value;$("#s-rate-v").textContent=e.target.value;save()};
   $("#s-test").onclick=()=>{pickVoice();$("#s-voice").textContent=jaVoice?jaVoice.name:'（尚未偵測到日文語音）';speak("日本語を勉強しています")};
   $("#copy").onclick=async()=>{try{await navigator.clipboard.writeText(JSON.stringify(S));toast("已複製到剪貼簿")}catch(e){$("#exp").select();toast("請手動全選複製")}};
-  $("#import").onclick=()=>{try{const s=JSON.parse($("#imp").value);if(!s.cards)throw 0;S=Object.assign(defaultState(),s);save();toast("已匯入");render()}catch(e){toast("格式不正確")}};
+  $("#import").onclick=()=>{try{const s=JSON.parse($("#imp").value);if(!s.cards)throw 0;S=Object.assign(defaultState(),s);S.settings={...defaultState().settings,...s.settings};session=null;quizState=null;if((sprintState().mode||"office")==="office")setQuiet();save();toast("已匯入");render()}catch(e){toast("格式不正確")}};
   $("#reset").onclick=()=>{if($("#reset").dataset.c){S=defaultState();save();session=null;toast("已重設");view="home";render()}else{$("#reset").dataset.c=1;$("#reset").textContent="確定要重設？再按一次";}};
 }
 
+</script>
+<script src="practice-data.js"></script>
+<script src="sprint.js"></script>
+<script>
 render();
 if("serviceWorker" in navigator&&location.protocol==="https:"&&!location.hostname.endsWith("claude.ai")&&!location.hostname.includes("claudeusercontent")){navigator.serviceWorker.register("sw.js").catch(()=>{})}
 </script>

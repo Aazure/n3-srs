@@ -5,6 +5,7 @@ const saved={cards:{v0:{seen:3,box:2,due:'2026-11-06'},v739:{seen:7,box:4,due:'2
 const ctx=vm.createContext({document:doc,window:{scrollTo(){}},localStorage:{getItem:()=>JSON.stringify(saved),setItem(){}},setTimeout,clearTimeout,console});
 const run=s=>vm.runInContext(s,ctx);
 run(fs.readFileSync('data.js','utf8'));
+run(fs.readFileSync('speech.js','utf8'));
 const html=fs.readFileSync('index.html','utf8');
 run([...html.matchAll(/<script>([\s\S]*?)<\/script>/g)][0][1]);
 const {v,g}=JSON.parse(run('JSON.stringify({v:V,g:G})'));

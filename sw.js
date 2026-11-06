@@ -1,5 +1,5 @@
-const CACHE='n3srs-content-v3';
-const FILES=['./','./index.html','./data.js','./practice-data.js','./sprint.js','./manifest.json','./icon.svg','./icon-192.png','./icon-512.png'];
+const CACHE='n3srs-voices-v4';
+const FILES=['./','./index.html','./data.js','./practice-data.js','./sprint.js','./speech.js','./manifest.json','./icon.svg','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting()))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k.startsWith('n3srs-')&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()))});
 self.addEventListener('fetch',e=>{

@@ -24,3 +24,7 @@
 逐條校讀狀態、變更前後與核對資料見 [校訂紀錄](audit/CONTENT_REVIEW.md) 及 [逐條紀錄](audit/content-review.json)。這是編輯校訂，並非逐筆外部認證或官方 N3 完整清單。
 
 驗證：`node tests/content.test.cjs`、`node tests/sprint.test.cjs`。
+
+## 對話角色語音
+
+聽力保留男／女標記，逐角色朗讀並在換人時停頓約 0.65 秒。設定頁可指定兩個角色的日文聲音；僅有一個聲音時使用音高差異輔助區分，不代表兩個真實聲線。靜音、離頁、換題或重播會取消待播句子。語音清單與離線可用性依裝置而異。驗證：`node tests/speech.test.cjs`。

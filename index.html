@@ -133,6 +133,7 @@ body.muted .spk:not(#mute){display:none}
 <main id="main"></main>
 <div class="toast" id="toast"></div>
 <script src="data.js"></script>
+<script src="speech.js"></script>
 <script>
 // ---------- utils ----------
 const $=s=>document.querySelector(s);
@@ -142,9 +143,6 @@ const dayDiff=(a,b)=>Math.round((new Date(b)-new Date(a))/86400000);
 const addDays=(key,n)=>{const d=new Date(key+"T00:00:00");d.setDate(d.getDate()+n);return todayKey(d)};
 const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
 const sample=(a,n,excl)=>shuffle(a.filter(x=>x!==excl)).slice(0,n);
-let jaVoice=null;function pickVoice(){try{const vs=speechSynthesis.getVoices().filter(v=>/^ja/i.test(v.lang));jaVoice=vs.find(v=>/Kyoko|O-ren|Google|Nanami|Keita|Premium|Enhanced/i.test(v.name))||vs[0]||null}catch(e){}}
-if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice}
-function speak(text,rate){try{if(S.settings.mute){return}if(!("speechSynthesis" in window)){toast("此瀏覽器不支援語音");return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang="ja-JP";if(jaVoice)u.voice=jaVoice;u.rate=rate||(S.settings.rate||0.9);speechSynthesis.speak(u);if(!jaVoice)toast("找不到日文語音，請在系統安裝日文語音包")}catch(e){}}
 function spk(text){return `<button class="spk" data-say="${esc(text)}" title="朗讀">🔊</button>`}
 function bindSpk(){document.querySelectorAll("[data-say]").forEach(b=>b.onclick=e=>{e.stopPropagation();speak(b.dataset.say)})}
 let toastT;function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),1800)}
@@ -188,8 +186,8 @@ function todayNewLeft(){const d=S.days[todayKey()]||{newV:0,newG:0};return{v:Mat
 
 // ---------- routing ----------
 let view="home";let session=null;let quizState=null;
-document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{view=b.dataset.v;render()});
-$("#mute").onclick=()=>{S.settings.mute=!S.settings.mute;if(S.settings.mute&&"speechSynthesis" in window)speechSynthesis.cancel();save();document.body.classList.toggle("muted",!!S.settings.mute);$("#mute").textContent=S.settings.mute?"🔇":"🔊";toast(S.settings.mute?"已靜音（🔊 按鈕也不會出聲）":"聲音已開啟");if(!S.settings.mute)speak("音声オン")};
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{stopSpeech();view=b.dataset.v;render()});
+$("#mute").onclick=()=>{S.settings.mute=!S.settings.mute;if(S.settings.mute)stopSpeech();save();document.body.classList.toggle("muted",!!S.settings.mute);$("#mute").textContent=S.settings.mute?"🔇":"🔊";toast(S.settings.mute?"已靜音（🔊 按鈕也不會出聲）":"聲音已開啟");if(!S.settings.mute)speak("音声オン")};
 function render(){
   document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("active",b.dataset.v===view));
   document.body.classList.toggle("muted",!!S.settings.mute);
@@ -403,7 +401,8 @@ function renderSettings(m){
   <p class="muted" style="margin-top:0">右上角 🔇/🔊 是總開關。靜音時整個網站不會發出任何聲音，🔊 按鈕也會隱藏。</p><div class="row"><label><input type="checkbox" id="s-auto" ${S.settings.auto?'checked':''}> 聲音開啟時，翻面／答題後自動朗讀</label></div>
   <div class="row" style="margin-top:8px">語速 <input type="range" id="s-rate" min="0.5" max="1.3" step="0.1" value="${S.settings.rate||0.9}"> <span id="s-rate-v">${S.settings.rate||0.9}</span></div>
   <div class="row" style="margin-top:8px"><button class="btn small secondary" id="s-test">試聽：日本語を勉強しています</button></div>
-  <p class="muted">使用瀏覽器內建語音（不需網路）。iPhone/Mac 的 Safari、Android 的 Chrome 通常已內建日文聲音；Windows 需在系統語言設定安裝「日本語」語音包。目前偵測到：<span id="s-voice">${jaVoice?esc(jaVoice.name):'（尚未偵測到日文語音）'}</span></p></div>
+  <p class="muted">使用裝置或瀏覽器提供的日文語音；聲音種類與離線可用性依裝置而異，部分聲音需要網路。若找不到日文聲音，可在系統語言設定安裝日文語音包。目前偵測到：<span id="s-voice">${jaVoice?esc(jaVoice.name):'（尚未偵測到日文語音）'}</span></p></div>
+  <div class="card" id="dialogue-voices"></div>
   <div class="card"><h2>備份 / 還原進度</h2>
   <p class="muted">進度存在這個瀏覽器裡。換裝置或清快取前，請先複製下方 JSON 存起來；到新裝置貼回來再按「匯入」。</p>
   <textarea id="exp" readonly>${esc(JSON.stringify(S))}</textarea>
@@ -418,6 +417,7 @@ function renderSettings(m){
   <li>每日新項目為上限；11/20 起減量、11/26 起停止新增。到期複習多時自動減量。</li>
   <li>文法請連例句一起唸出來，N3 讀解與聽解很吃句型的「語感」。</li>
   </ul></div>`;
+  renderVoiceControls();
   $("#s-save").onclick=()=>{S.settings.newV=Math.max(0,Math.min(100,Math.floor(+$("#s-v").value||0)));S.settings.newG=Math.max(0,Math.min(30,Math.floor(+$("#s-g").value||0)));save();toast("已儲存")};
   $("#s-auto").onchange=e=>{S.settings.auto=e.target.checked;save()};
   $("#s-rate").oninput=e=>{S.settings.rate=+e.target.value;$("#s-rate-v").textContent=e.target.value;save()};

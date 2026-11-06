@@ -4,6 +4,7 @@ const elements=new Map();const doc={querySelector:s=>{if(!elements.has(s))elemen
 const storage={};const ctx=vm.createContext({document:doc,window:{scrollTo(){}},navigator:{},location:{protocol:'http:',hostname:'localhost'},localStorage:{getItem:k=>storage[k]||null,setItem:(k,v)=>storage[k]=v},setTimeout,clearTimeout,console});
 const run=s=>vm.runInContext(s,ctx);
 run(fs.readFileSync('data.js','utf8'));
+run(fs.readFileSync('speech.js','utf8'));
 const html=fs.readFileSync('index.html','utf8');
 run([...html.matchAll(/<script>([\s\S]*?)<\/script>/g)][0][1]);
 run(fs.readFileSync('practice-data.js','utf8'));run(fs.readFileSync('sprint.js','utf8'));

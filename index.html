@@ -432,7 +432,7 @@ function renderSettings(m){
 <script src="sprint.js"></script>
 <script>
 render();
-if("serviceWorker" in navigator&&location.protocol==="https:"&&!location.hostname.endsWith("claude.ai")&&!location.hostname.includes("claudeusercontent")){navigator.serviceWorker.register("sw.js").catch(()=>{})}
+if("serviceWorker" in navigator&&location.protocol==="https:"&&!location.hostname.endsWith("claude.ai")&&!location.hostname.includes("claudeusercontent")){navigator.serviceWorker.register("sw.js").then(reg=>{reg.update().catch(()=>{});reg.addEventListener("updatefound",()=>{const nw=reg.installing;nw&&nw.addEventListener("statechange",()=>{if(nw.state==="installed"&&navigator.serviceWorker.controller){nw.postMessage("skipWaiting");toast("已更新到最新版，重新整理即可套用")}})})}).catch(()=>{})}
 </script>
 </body>
 </html>

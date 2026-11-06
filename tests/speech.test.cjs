@@ -1,0 +1,16 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+let voices=[{name:'Kyoko',lang:'ja-JP',voiceURI:'female'},{name:'Otoya',lang:'ja-JP',voiceURI:'male'},{name:'English',lang:'en-US',voiceURI:'en'}],spoken=[],timers=new Map(),serial=0,cancelled=0;
+const speech={getVoices:()=>voices,cancel:()=>cancelled++,speak:u=>spoken.push(u)};
+const c=vm.createContext({window:{speechSynthesis:speech},speechSynthesis:speech,SpeechSynthesisUtterance:function(text){this.text=text},document:{querySelector:()=>null},S:{settings:{mute:false,rate:.9}},setTimeout:(f,ms)=>{timers.set(++serial,{f,ms});return serial},clearTimeout:id=>timers.delete(id),toast(){}});
+const run=s=>vm.runInContext(s,c);run(fs.readFileSync('speech.js','utf8'));
+run("speakDialogue('女：こんにちは。男：はい。女：また明日。')");
+assert.equal(spoken[0].text,'こんにちは。');assert.equal(spoken[0].voice.voiceURI,'female');
+spoken[0].onend();assert.equal([...timers.values()][0].ms,650);[...timers.values()][0].f();timers.clear();
+assert.equal(spoken[1].text,'はい。');assert.equal(spoken[1].voice.voiceURI,'male');
+const old=spoken[1];old.onend();run('stopSpeech()');assert.equal(timers.size,0);old.onend();assert.equal(timers.size,0);
+voices=[voices[0]];run("speakDialogue('男：一。女：二。')");assert.equal(spoken.at(-1).pitch,.88);spoken.at(-1).onend();[...timers.values()][0].f();timers.clear();assert.equal(spoken.at(-1).pitch,1.12);
+run('stopSpeech();S.settings.mute=true');let n=spoken.length;run("speakDialogue('女：静かに。')");assert.equal(spoken.length,n);
+run("S.settings.mute=false;S.settings.voiceMale='female';speakDialogue('男：手動。')");assert.equal(spoken.at(-1).voice.voiceURI,'female');
+voices=[];n=spoken.length;run("speakDialogue('女：なし。')");assert.equal(spoken.length,n);
+voices=[{name:'Keita',lang:'ja-JP',voiceURI:'k'}];speech.onvoiceschanged();assert.equal(run('jaVoice.name'),'Keita');
+console.log('PASS: ordered dialogue, role voices, switch pause, cancellation including late events, single-voice fallback, mute, manual selection, delayed voices');

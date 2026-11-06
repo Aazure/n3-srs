@@ -27,7 +27,7 @@ function skillStats(k){
   const total=rows.reduce((n,r)=>n+r.total,0), correct=rows.reduce((n,r)=>n+r.correct,0);
   return {total,correct,weak:rows.filter(r=>!r.lastOK).length,unique:rows.length};
 }
-function setQuiet(){S.settings.mute=true;S.settings.auto=false;if('speechSynthesis' in window)speechSynthesis.cancel();save();}
+function setQuiet(){S.settings.mute=true;S.settings.auto=false;stopSpeech();save();}
 function openSprint(mode){
   sprintState().mode=mode;if(mode==='office')setQuiet();
   save();view='home';render();
@@ -92,13 +92,13 @@ function renderTraining(m){
   <h2 class="jp" style="margin-top:20px">${esc(q.q)}</h2><div class="opts">${q.opts.map((x,i)=>`<button data-option="${i}" ${ans?'disabled':''} class="${ans?(i===q.answer?'correct':i===ans.choice?'wrong':''):''}">${esc(x)}</button>`).join('')}</div>
   ${ans?`<div role="status"><h3>${ans.ok?'答對了':'再確認一次用法'}</h3><p>${esc(q.why)}</p>${listening?`<details open><summary>逐字稿：看懂後，關閉再聽一次</summary><p class="jp">${esc(q.passage)}</p></details>`:''}${!ans.ok?`<label>這次卡在哪裡？ <select id="reason"><option value="">選擇原因</option>${['單字不認識','聽不出聲音','文法混淆','漏看或漏聽條件','閱讀太慢'].map(r=>`<option ${ans.reason===r?'selected':''}>${r}</option>`).join('')}</select></label>`:''}<p><button class="btn" id="training-next">${a.i===a.qs.length-1?'查看結果':'下一題'}</button></p></div>`:''}
   </div><button class="btn small secondary" id="end-training">結束本題組（保留已作答紀錄）</button>`;
-  $('#pause-training').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.cancel();view='home';render()};
-  $('#end-training').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.cancel();delete p.active;save();view='home';render()};
+  $('#pause-training').onclick=()=>{stopSpeech();view='home';render()};
+  $('#end-training').onclick=()=>{stopSpeech();delete p.active;save();view='home';render()};
   if(listening)$('#listen').onclick=()=>{
     if(!('speechSynthesis' in window)){$('#audio-status').textContent='此瀏覽器無語音功能，請換支援的瀏覽器或使用官方音檔。';return}
     pickVoice();if(!jaVoice){$('#audio-status').textContent='未偵測到日文語音，請安裝日文語音後再試；此題可暫停。';return}
     S.settings.mute=false;save();document.body.classList.remove('muted');$('#mute').textContent='🔊';
-    speak(q.passage.replace(/女：/g,'').replace(/男：/g,''));$('#audio-status').textContent='播放中；可按右上角靜音立即停止。';
+    speakDialogue(q.passage);
   };
   document.querySelectorAll('[data-option]').forEach(b=>b.onclick=()=>{
     if(a.answers[a.i])return;
@@ -110,7 +110,7 @@ function renderTraining(m){
     save();render();
   });
   if($('#reason'))$('#reason').onchange=e=>{ans.reason=e.target.value;p.results[q.id].reason=e.target.value;save()};
-  if($('#training-next'))$('#training-next').onclick=()=>{if('speechSynthesis' in window)speechSynthesis.cancel();a.i++;save();render()};
+  if($('#training-next'))$('#training-next').onclick=()=>{stopSpeech();a.i++;save();render()};
 }
 // Merge missing settings when loading older backups.
 S.settings={...defaultState().settings,...S.settings};
